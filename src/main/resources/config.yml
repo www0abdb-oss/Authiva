@@ -1,0 +1,9 @@
+# Authiva configuration
+
+authentication:
+  login-timeout: 60
+  max-login-attempts: 5
+  password-min-length: 8
+
+storage:
+  type: sqlite
