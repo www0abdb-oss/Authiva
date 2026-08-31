@@ -1,5 +1,5 @@
 name: Authiva
-version: ${project.version}
+version: ${version}
 main: www0abdb.oss.authiva.Authiva
 
 description: Lightweight and secure server-side authentication for Minecraft.
@@ -26,3 +26,7 @@ commands:
   unregister:
     description: Delete your Authiva account
     usage: /unregister <password>
+
+  authiva:
+    description: Authiva administration command
+    usage: /authiva <setpassword|unregister|delete|logout|info|list|reload|help>

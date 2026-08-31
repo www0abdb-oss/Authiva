@@ -216,6 +216,117 @@ public final class AuthService {
         });
     }
 
+    public AdminSetPasswordResult adminSetPassword(
+            String username,
+            String newPassword
+    ) throws SQLException {
+
+        var account = accountRepository.findByUsername(username);
+
+        if (account.isEmpty()) {
+            return AdminSetPasswordResult.NOT_REGISTERED;
+        }
+
+        String passwordHash = PasswordHasher.hash(newPassword);
+
+        if (!accountRepository.updatePasswordHash(
+                account.get().uuid(),
+                passwordHash
+        )) {
+            return AdminSetPasswordResult.FAILED;
+        }
+
+        return AdminSetPasswordResult.SUCCESS;
+    }
+
+    public void adminSetPasswordAsync(
+            String username,
+            String newPassword,
+            java.util.function.Consumer<AdminSetPasswordResult> callback,
+            java.util.function.Consumer<Exception> errorCallback
+    ) {
+        executor.execute(() -> {
+            try {
+                callback.accept(
+                        adminSetPassword(username, newPassword)
+                );
+            } catch (Exception exception) {
+                errorCallback.accept(exception);
+            }
+        });
+    }
+
+    public AdminUnregisterResult adminUnregister(
+            String username
+    ) throws SQLException {
+
+        var account = accountRepository.findByUsername(username);
+
+        if (account.isEmpty()) {
+            return AdminUnregisterResult.NOT_REGISTERED;
+        }
+
+        UUID uuid = account.get().uuid();
+
+        if (!accountRepository.deleteAccount(uuid)) {
+            return AdminUnregisterResult.FAILED;
+        }
+
+        sessionManager.unauthenticate(uuid);
+
+        return AdminUnregisterResult.SUCCESS;
+    }
+
+    public void adminUnregisterAsync(
+            String username,
+            java.util.function.Consumer<AdminUnregisterResult> callback,
+            java.util.function.Consumer<Exception> errorCallback
+    ) {
+        executor.execute(() -> {
+            try {
+                callback.accept(adminUnregister(username));
+            } catch (Exception exception) {
+                errorCallback.accept(exception);
+            }
+        });
+    }
+
+    public java.util.List<AccountRepository.AccountRecord> adminListAccounts()
+            throws SQLException {
+        return accountRepository.findAll();
+    }
+
+    public java.util.Optional<AccountRepository.AccountRecord> adminFindAccount(
+            String username
+    ) throws SQLException {
+        return accountRepository.findByUsername(username);
+    }
+
+    public AdminLogoutResult adminLogout(String username) throws SQLException {
+        var account = accountRepository.findByUsername(username);
+
+        if (account.isEmpty()) {
+            return AdminLogoutResult.NOT_REGISTERED;
+        }
+
+        sessionManager.unauthenticate(account.get().uuid());
+        return AdminLogoutResult.SUCCESS;
+    }
+
+    public void adminLogoutAsync(
+            String username,
+            java.util.function.Consumer<AdminLogoutResult> callback,
+            java.util.function.Consumer<Exception> errorCallback
+    ) {
+        executor.execute(() -> {
+            try {
+                callback.accept(adminLogout(username));
+            } catch (Exception exception) {
+                errorCallback.accept(exception);
+            }
+        });
+    }
+
     public boolean hasAccount(UUID uuid) throws SQLException {
         return accountRepository.exists(uuid);
     }
@@ -247,6 +358,24 @@ public final class AuthService {
         NOT_REGISTERED,
         INVALID_PASSWORD,
         FAILED
+    }
+
+    public enum AdminSetPasswordResult {
+        SUCCESS,
+        NOT_REGISTERED,
+        FAILED
+    }
+
+    public enum AdminUnregisterResult {
+        SUCCESS,
+        NOT_REGISTERED,
+        FAILED
+    }
+
+
+    public enum AdminLogoutResult {
+        SUCCESS,
+        NOT_REGISTERED
     }
 
     public enum LoginResult {

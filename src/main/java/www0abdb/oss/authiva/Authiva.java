@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import www0abdb.oss.authiva.auth.AuthListener;
 import www0abdb.oss.authiva.auth.AuthService;
 import www0abdb.oss.authiva.auth.AuthSessionManager;
+import www0abdb.oss.authiva.commands.AdminAuthivaCommand;
 import www0abdb.oss.authiva.commands.LoginCommand;
 import www0abdb.oss.authiva.commands.UnregisterCommand;
 import www0abdb.oss.authiva.commands.ChangePasswordCommand;
@@ -81,6 +82,14 @@ public final class Authiva extends JavaPlugin {
 
         getCommand("logout").setExecutor(
                 new LogoutCommand(authService)
+        );
+
+        getCommand("authiva").setExecutor(
+                new AdminAuthivaCommand(
+                        authService,
+                        this,
+                        authivaConfig
+                )
         );
 
 

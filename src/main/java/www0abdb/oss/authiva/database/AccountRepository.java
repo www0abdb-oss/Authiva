@@ -119,6 +119,52 @@ public final class AccountRepository {
         }
     }
 
+    public Optional<AccountRecord> findByUsername(String username)
+            throws SQLException {
+
+        String sql = """
+                SELECT uuid, username, password_hash, created_at
+                FROM accounts
+                WHERE username = ?
+                LIMIT 1
+                """;
+
+        try (PreparedStatement statement =
+                     databaseManager.getConnection().prepareStatement(sql)) {
+
+            statement.setString(1, username);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return Optional.empty();
+                }
+
+                return Optional.of(readAccount(resultSet));
+            }
+        }
+    }
+
+    public java.util.List<AccountRecord> findAll() throws SQLException {
+        String sql = """
+                SELECT uuid, username, password_hash, created_at
+                FROM accounts
+                ORDER BY username COLLATE NOCASE
+                """;
+
+        java.util.List<AccountRecord> accounts = new java.util.ArrayList<>();
+
+        try (PreparedStatement statement =
+                     databaseManager.getConnection().prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                accounts.add(readAccount(resultSet));
+            }
+        }
+
+        return accounts;
+    }
+
     public Optional<AccountRecord> findByUuid(UUID uuid)
             throws SQLException {
 

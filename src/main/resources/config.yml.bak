@@ -143,6 +143,17 @@ messages:
   adminOnly: "&cOnly server operators can use this command."
   adminSetPasswordUsage: "&eUsage: /authiva setpassword <player> <newPassword>"
   adminUnregisterUsage: "&eUsage: /authiva unregister <player>"
+  adminPasswordChanged: "&aPassword changed successfully for &f{player}&a."
+  adminAccountUnregistered: "&aAccount unregistered successfully for &f{player}&a."
+  adminPlayerNotRegistered: "&cThat player does not have an Authiva account."
+  adminSetPasswordFailed: "&cUnable to change that account password right now."
+  adminUnregisterFailed: "&cUnable to unregister that account right now."
+  adminReloaded: "&aAuthiva configuration reloaded."
+  adminHelp: "&eAuthiva admin: &f/authiva setpassword <player> <newPassword> &7| &f/authiva unregister <player> &7| &f/authiva reload"
+  adminOnly: "&cOnly server operators can use this command."
+
+  adminSetPasswordUsage: "&eUsage: /authiva setpassword <player> <newPassword>"
+  adminUnregisterUsage: "&eUsage: /authiva unregister <player>"
   adminLogoutUsage: "&eUsage: /authiva logout <player>"
   adminInfoUsage: "&eUsage: /authiva info <player>"
 
@@ -165,4 +176,6 @@ messages:
   adminListFailed: "&cUnable to retrieve the account list."
 
   adminReloaded: "&aAuthiva configuration reloaded."
+
   adminHelp: "&eAuthiva admin commands:"
+
