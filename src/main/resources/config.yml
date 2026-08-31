@@ -1,9 +1,134 @@
 # Authiva configuration
 
-authentication:
-  login-timeout: 60
-  max-login-attempts: 5
-  password-min-length: 8
+settings:
 
-storage:
-  type: sqlite
+  # Authentication timeout in seconds.
+  timeout: 60
+
+  # Minimum password length.
+  minPasswordLength: 6
+
+  # Maximum password length.
+  maxPasswordLength: 32
+
+  password:
+
+    # Allow letters: a-z / A-Z
+    allowLetters: true
+
+    # Allow numbers: 0-9
+    allowNumbers: true
+
+    # Allow symbols.
+    allowSymbols: true
+
+    # Require at least one letter.
+    requireLetter: true
+
+    # Require at least one number.
+    requireNumber: true
+
+    # Require at least one symbol.
+    requireSymbol: false
+
+  # Commands available before authentication.
+  allowCommands:
+    - /login
+    - /log
+    - /l
+    - /register
+    - /reg
+    - /email
+    - /captcha
+    - /2fa
+    - /totp
+
+  # Passwords that cannot be used.
+  unsafePasswords:
+    - '12345678'
+    - password
+    - qwertyui
+    - '123456789'
+    - '87654321'
+    - '1234567890'
+    - asdfghjkl
+    - zxcvbnm,
+    - asdfghjk
+    - '12312312'
+    - '123123123'
+    - '32132132'
+    - '321321321'
+
+protection:
+
+  # Prevent unauthenticated movement.
+  freezeMovement: true
+
+  # Prevent unauthenticated interaction.
+  blockInteraction: true
+
+  # Prevent unauthenticated attacks.
+  blockAttacks: true
+
+  # Prevent mobs from targeting unauthenticated players.
+  preventMobTargeting: true
+
+  # Treat commands as case-insensitive.
+  caseInsensitiveCommands: true
+
+
+# Messages
+# Use & color codes.
+# Available placeholders: {min}, {max}
+
+messages:
+  loginUsage: "&eUsage: /login <password>."
+
+  onlyPlayers: "&cOnly players can use this command."
+
+  loginRequired: "&cYou must login or register first."
+
+  loginPrompt: "&ePlease login using /login <password>."
+
+  noAccount: "&eYou do not have an account."
+
+  registerPrompt: "&eRegister using /register <password> <confirmPassword>."
+
+  loginSuccess: "&aLogin successful."
+
+  alreadyLoggedIn: "&eYou are already logged in."
+
+  notRegistered: "&cYou do not have an account. Use /register <password> <confirmPassword>."
+
+  invalidPassword: "&cInvalid password."
+
+  registerUsage: "&eUsage: /register <password> <confirmPassword>."
+
+  passwordMismatch: "&cPasswords do not match."
+
+  passwordTooShort: "&cPassword must be at least {min} characters."
+
+  passwordTooLong: "&cPassword must be at most {max} characters."
+
+  passwordNeedsLetter: "&cPassword must contain at least one letter."
+
+  passwordNeedsNumber: "&cPassword must contain at least one number."
+
+  passwordNeedsSymbol: "&cPassword must contain at least one symbol."
+
+  invalidPasswordCharacters: "&cYour password contains characters that are not allowed."
+
+  unsafePassword: "&cThis password is too common or unsafe."
+
+  accountCreated: "&aAccount created successfully. You are now logged in."
+
+  accountCreatedLoginFailed: "&eAccount created. Please use /login <password>."
+
+  alreadyRegistered: "&cYou already have an account."
+
+  usernameTaken: "&cThat username is already registered."
+
+  registerFailed: "&cCould not create your account."
+
+  authUnavailable: "&cAuthentication service is temporarily unavailable."
+
