@@ -46,3 +46,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# Local Paper test server
+run/
