@@ -1,7 +1,21 @@
 name: Authiva
 version: ${project.version}
 main: www0abdb.oss.authiva.Authiva
+
 description: Lightweight and secure server-side authentication for Minecraft.
+
 author: www0abdb-oss
 website: https://github.com/www0abdb-oss/Authiva
+
 api-version: '26.2'
+
+commands:
+  register:
+    description: Create an Authiva account
+    usage: /register <password>
+  login:
+    description: Log into your Authiva account
+    usage: /login <password>
+  logout:
+    description: Log out of your Authiva account
+    usage: /logout
