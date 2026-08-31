@@ -6,6 +6,8 @@ import www0abdb.oss.authiva.auth.AuthListener;
 import www0abdb.oss.authiva.auth.AuthService;
 import www0abdb.oss.authiva.auth.AuthSessionManager;
 import www0abdb.oss.authiva.commands.LoginCommand;
+import www0abdb.oss.authiva.commands.UnregisterCommand;
+import www0abdb.oss.authiva.commands.ChangePasswordCommand;
 import www0abdb.oss.authiva.commands.LogoutCommand;
 import www0abdb.oss.authiva.commands.RegisterCommand;
 import www0abdb.oss.authiva.database.AccountRepository;
@@ -79,6 +81,23 @@ public final class Authiva extends JavaPlugin {
 
         getCommand("logout").setExecutor(
                 new LogoutCommand(authService)
+        );
+
+
+        getCommand("changepassword").setExecutor(
+                new ChangePasswordCommand(
+                        authService,
+                        this,
+                        authivaConfig
+                )
+        );
+
+        getCommand("unregister").setExecutor(
+                new UnregisterCommand(
+                        authService,
+                        this,
+                        authivaConfig
+                )
         );
 
         new Metrics(this, 33742);

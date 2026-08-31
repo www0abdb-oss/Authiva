@@ -120,6 +120,102 @@ public final class AuthService {
         });
     }
 
+
+    public ChangePasswordResult changePassword(
+            UUID uuid,
+            String currentPassword,
+            String newPassword
+    ) throws SQLException {
+
+        var account = accountRepository.findByUuid(uuid);
+
+        if (account.isEmpty()) {
+            return ChangePasswordResult.NOT_REGISTERED;
+        }
+
+        if (!PasswordHasher.verify(
+                currentPassword,
+                account.get().passwordHash()
+        )) {
+            return ChangePasswordResult.INVALID_CURRENT_PASSWORD;
+        }
+
+        String newPasswordHash = PasswordHasher.hash(newPassword);
+
+        if (!accountRepository.updatePasswordHash(
+                uuid,
+                newPasswordHash
+        )) {
+            return ChangePasswordResult.FAILED;
+        }
+
+        return ChangePasswordResult.SUCCESS;
+    }
+
+    public void changePasswordAsync(
+            UUID uuid,
+            String currentPassword,
+            String newPassword,
+            java.util.function.Consumer<ChangePasswordResult> callback,
+            java.util.function.Consumer<Exception> errorCallback
+    ) {
+        executor.execute(() -> {
+            try {
+                ChangePasswordResult result = changePassword(
+                        uuid,
+                        currentPassword,
+                        newPassword
+                );
+                callback.accept(result);
+            } catch (Exception exception) {
+                errorCallback.accept(exception);
+            }
+        });
+    }
+
+    public UnregisterResult unregister(
+            UUID uuid,
+            String password
+    ) throws SQLException {
+
+        var account = accountRepository.findByUuid(uuid);
+
+        if (account.isEmpty()) {
+            return UnregisterResult.NOT_REGISTERED;
+        }
+
+        if (!PasswordHasher.verify(
+                password,
+                account.get().passwordHash()
+        )) {
+            return UnregisterResult.INVALID_PASSWORD;
+        }
+
+        if (!accountRepository.deleteAccount(uuid)) {
+            return UnregisterResult.FAILED;
+        }
+
+        sessionManager.unauthenticate(uuid);
+
+        return UnregisterResult.SUCCESS;
+    }
+
+    public void unregisterAsync(
+            UUID uuid,
+            String password,
+            java.util.function.Consumer<UnregisterResult> callback,
+            java.util.function.Consumer<Exception> errorCallback
+    ) {
+        executor.execute(() -> {
+            try {
+                UnregisterResult result = unregister(uuid, password);
+                callback.accept(result);
+            } catch (Exception exception) {
+                errorCallback.accept(exception);
+            }
+        });
+    }
+
     public boolean hasAccount(UUID uuid) throws SQLException {
         return accountRepository.exists(uuid);
     }
@@ -136,6 +232,21 @@ public final class AuthService {
         SUCCESS,
         ALREADY_REGISTERED,
         USERNAME_TAKEN
+    }
+
+
+    public enum ChangePasswordResult {
+        SUCCESS,
+        NOT_REGISTERED,
+        INVALID_CURRENT_PASSWORD,
+        FAILED
+    }
+
+    public enum UnregisterResult {
+        SUCCESS,
+        NOT_REGISTERED,
+        INVALID_PASSWORD,
+        FAILED
     }
 
     public enum LoginResult {

@@ -132,3 +132,10 @@ messages:
 
   authUnavailable: "&cAuthentication service is temporarily unavailable."
 
+  changePasswordUsage: "&cUsage: /changepassword <currentPassword> <newPassword>"
+  passwordChanged: "&aYour password has been changed successfully."
+  invalidCurrentPassword: "&cYour current password is incorrect."
+  changePasswordFailed: "&cUnable to change your password right now."
+  unregisterUsage: "&cUsage: /unregister <password>"
+  accountUnregistered: "&aYour Authiva account has been unregistered."
+  unregisterFailed: "&cUnable to unregister your account right now."

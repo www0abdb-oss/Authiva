@@ -81,6 +81,44 @@ public final class AccountRepository {
         }
     }
 
+
+    public boolean updatePasswordHash(
+            UUID uuid,
+            String passwordHash
+    ) throws SQLException {
+
+        String sql = """
+                UPDATE accounts
+                SET password_hash = ?
+                WHERE uuid = ?
+                """;
+
+        try (PreparedStatement statement =
+                     databaseManager.getConnection().prepareStatement(sql)) {
+
+            statement.setString(1, passwordHash);
+            statement.setString(2, uuid.toString());
+
+            return statement.executeUpdate() > 0;
+        }
+    }
+
+    public boolean deleteAccount(UUID uuid) throws SQLException {
+
+        String sql = """
+                DELETE FROM accounts
+                WHERE uuid = ?
+                """;
+
+        try (PreparedStatement statement =
+                     databaseManager.getConnection().prepareStatement(sql)) {
+
+            statement.setString(1, uuid.toString());
+
+            return statement.executeUpdate() > 0;
+        }
+    }
+
     public Optional<AccountRecord> findByUuid(UUID uuid)
             throws SQLException {
 

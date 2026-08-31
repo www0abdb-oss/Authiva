@@ -19,3 +19,10 @@ commands:
   logout:
     description: Log out of your Authiva account
     usage: /logout
+
+  changepassword:
+    description: Change your Authiva account password
+    usage: /changepassword <currentPassword> <newPassword>
+  unregister:
+    description: Delete your Authiva account
+    usage: /unregister <password>
