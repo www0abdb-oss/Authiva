@@ -161,3 +161,28 @@ Before submitting changes, make sure the project builds successfully:
 ## Disclaimer
 
 Authiva is provided as an authentication solution for Minecraft servers. Server administrators are responsible for configuring and operating their servers securely.
+
+<div align="center">
+
+# Authiva
+
+Lightweight and configurable authentication plugin for Paper servers.
+
+<br>
+
+<a href="https://hangar.papermc.io/www0abdb-oss/Authiva">
+  <img src="https://modfolio.creeperkatze.dev/hangar/project/Authiva/downloads" alt="Authiva Downloads">
+</a>
+&nbsp;&nbsp;
+<a href="https://github.com/www0abdb-oss/Authiva">
+  <img src="https://img.shields.io/github/stars/www0abdb-oss/Authiva?style=flat&label=GitHub%20Stars" alt="GitHub Stars">
+</a>
+
+<br><br>
+
+<a href="https://hangar.papermc.io/www0abdb-oss/Authiva">Hangar</a>
+ •  <a href="https://github.com/www0abdb-oss/Authiva">Source Code</a>
+ •  <a href="https://github.com/www0abdb-oss/Authiva/issues">Issues</a>
+
+</div>
+
