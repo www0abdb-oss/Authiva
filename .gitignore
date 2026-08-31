@@ -49,3 +49,7 @@ bin/
 
 # Local Paper test server
 run/
+
+run/
+.gradle/
+build/
