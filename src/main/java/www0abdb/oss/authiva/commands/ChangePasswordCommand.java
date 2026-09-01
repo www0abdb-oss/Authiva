@@ -106,7 +106,7 @@ public final class ChangePasswordCommand implements CommandExecutor {
             return true;
         }
 
-        for (String unsafe : config.getUnsafePasswords()) {
+        for (String unsafe : config.getForbiddenPasswords()) {
             if (newPassword.equalsIgnoreCase(unsafe)) {
                 player.sendMessage(config.getMessage("unsafePassword"));
                 return true;

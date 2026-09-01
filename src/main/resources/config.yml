@@ -1,168 +1,357 @@
-# Authiva configuration
+# ============================================================
+# Authiva Configuration
+# ============================================================
 
-settings:
+authentication:
 
-  # Authentication timeout in seconds.
-  timeout: 60
+  # Seconds before an unauthenticated player is kicked.
+  login-timeout: 60
 
-  # Minimum password length.
-  minPasswordLength: 6
+  # Maximum failed login attempts.
+  max-login-attempts: 5
 
-  # Maximum password length.
-  maxPasswordLength: 32
+  # Password length.
+  password-min-length: 8
+  password-max-length: 32
 
-  password:
+  # Repeated authentication reminders.
+  reminders:
+    enabled: true
 
-    # Allow letters: a-z / A-Z
-    allowLetters: true
+    # Seconds between reminders.
+    interval: 5
 
-    # Allow numbers: 0-9
-    allowNumbers: true
+    # Send the authentication message immediately after joining.
+    send-on-join: true
 
-    # Allow symbols.
-    allowSymbols: true
+  # Automatically authenticate after successful registration.
+  auto-login-after-register: true
 
-    # Require at least one letter.
-    requireLetter: true
 
-    # Require at least one number.
-    requireNumber: true
+# ============================================================
+# Password
+# ============================================================
 
-    # Require at least one symbol.
-    requireSymbol: false
+password:
 
-  # Commands available before authentication.
-  allowCommands:
-    - /login
-    - /log
-    - /l
-    - /register
-    - /reg
-    - /email
-    - /captcha
-    - /2fa
-    - /totp
+  allow-letters: true
+  allow-numbers: true
+  allow-symbols: true
+
+  require-letter: true
+  require-number: true
+  require-symbol: false
 
   # Passwords that cannot be used.
-  unsafePasswords:
-    - '12345678'
-    - password
-    - qwertyui
-    - '123456789'
-    - '87654321'
-    - '1234567890'
-    - asdfghjkl
-    - zxcvbnm,
-    - asdfghjk
-    - '12312312'
-    - '123123123'
-    - '32132132'
-    - '321321321'
+  forbidden:
+    - "12345678"
+    - "123456789"
+    - "1234567890"
+    - "password"
+    - "password123"
+    - "qwerty"
+    - "qwerty123"
+    - "qwertyui"
+    - "admin"
+    - "admin123"
+    - "minecraft"
+    - "minecraft123"
+    - "letmein"
+    - "welcome"
+    - "abc123"
+    - "11111111"
+    - "00000000"
+
+  # Ignore upper/lower case when checking forbidden passwords.
+  forbidden-case-insensitive: true
+
+
+# ============================================================
+# Storage
+# ============================================================
+
+storage:
+
+  # Currently supported: sqlite
+  type: sqlite
+
+  file: authiva.db
+
+
+# ============================================================
+# Protection
+# ============================================================
 
 protection:
 
-  # Prevent unauthenticated movement.
-  freezeMovement: true
+  freeze-movement: true
+  block-interaction: true
+  block-attacks: true
+  prevent-mob-targeting: true
 
-  # Prevent unauthenticated interaction.
-  blockInteraction: true
+  block-damage: true
+  block-item-drop: true
+  block-item-pickup: true
+  block-inventory: true
+  block-held-item-change: true
 
-  # Prevent unauthenticated attacks.
-  blockAttacks: true
-
-  # Prevent mobs from targeting unauthenticated players.
-  preventMobTargeting: true
-
-  # Treat commands as case-insensitive.
-  caseInsensitiveCommands: true
+  case-insensitive-commands: true
 
 
+# ============================================================
+# Commands
+# ============================================================
+
+commands:
+
+  # Commands allowed before authentication.
+  allowed-before-login:
+    - login
+    - l
+    - log
+    - register
+    - reg
+
+  allow-help: false
+
+
+# ============================================================
+# Bypass
+# ============================================================
+
+bypass:
+
+  enabled: true
+  permission: authiva.bypass
+
+
+# ============================================================
+# Update Checker
+# ============================================================
+
+update-checker:
+
+  enabled: true
+  notify-operators: true
+
+
+# ============================================================
+# Metrics
+# ============================================================
+
+metrics:
+
+  enabled: true
+
+
+# ============================================================
 # Messages
-# Use & color codes.
-# Available placeholders: {min}, {max}
+# ============================================================
 
 messages:
-  loginUsage: "&eUsage: /login <password>."
 
-  onlyPlayers: "&cOnly players can use this command."
+  # Global prefix.
+  prefix: "&8[&bAuthiva&8] &r"
 
-  loginRequired: "&cYou must login or register first."
+  # Authentication
+  login-prompt:
+    - "{prefix}&eWelcome, &f{player}&e!"
+    - "{prefix}&7Please login to continue."
+    - "{prefix}&b/login <password>"
 
-  loginPrompt: "&ePlease login using /login <password>."
+  register-prompt:
+    - "{prefix}&eWelcome, &f{player}&e!"
+    - "{prefix}&7You don't have an account."
+    - "{prefix}&b/register <password> <confirmPassword>"
 
-  noAccount: "&eYou do not have an account."
+  reminder:
+    - "{prefix}&cYou are not authenticated!"
+    - "{prefix}&eUse &f/login <password> &eto continue."
 
-  registerPrompt: "&eRegister using /register <password> <confirmPassword>."
+  reminder-with-time:
+    - "{prefix}&eAuthentication required."
+    - "{prefix}&7Time remaining: &f{seconds}s"
+    - "{prefix}&b/login <password> &7or &b/register <password> <confirmPassword>"
 
-  loginSuccess: "&aLogin successful."
+  login-required:
+    - "{prefix}&cYou must login or register first."
 
-  alreadyLoggedIn: "&eYou are already logged in."
+  login-timeout:
+    - "{prefix}&cAuthentication timeout."
+    - "{prefix}&7You took too long to authenticate."
 
-  notRegistered: "&cYou do not have an account. Use /register <password> <confirmPassword>."
+  # Login
+  login-usage:
+    - "{prefix}&eUsage: &f/login <password>"
 
-  invalidPassword: "&cInvalid password."
+  login-success:
+    - "{prefix}&aLogin successful!"
+    - "{prefix}&7Welcome back, &f{player}&7."
 
-  registerUsage: "&eUsage: /register <password> <confirmPassword>."
+  already-logged-in:
+    - "{prefix}&eYou are already logged in."
 
-  passwordMismatch: "&cPasswords do not match."
+  not-registered:
+    - "{prefix}&cYou do not have an Authiva account."
+    - "{prefix}&eUse &f/register <password> <confirmPassword>"
 
-  passwordTooShort: "&cPassword must be at least {min} characters."
+  invalid-password:
+    - "{prefix}&cInvalid password."
+    - "{prefix}&7Attempts remaining: &f{remaining}"
 
-  passwordTooLong: "&cPassword must be at most {max} characters."
+  max-login-attempts:
+    - "{prefix}&cToo many failed login attempts."
 
-  passwordNeedsLetter: "&cPassword must contain at least one letter."
+  # Registration
+  register-usage:
+    - "{prefix}&eUsage: &f/register <password> <confirmPassword>"
 
-  passwordNeedsNumber: "&cPassword must contain at least one number."
+  password-mismatch:
+    - "{prefix}&cPasswords do not match."
 
-  passwordNeedsSymbol: "&cPassword must contain at least one symbol."
+  account-created:
+    - "{prefix}&aAccount created successfully!"
+    - "{prefix}&7You are now authenticated."
 
-  invalidPasswordCharacters: "&cYour password contains characters that are not allowed."
+  account-created-login-failed:
+    - "{prefix}&eAccount created."
+    - "{prefix}&7Please login using &f/login <password>"
 
-  unsafePassword: "&cThis password is too common or unsafe."
+  already-registered:
+    - "{prefix}&cYou already have an Authiva account."
 
-  accountCreated: "&aAccount created successfully. You are now logged in."
+  username-taken:
+    - "{prefix}&cThat username is already registered."
 
-  accountCreatedLoginFailed: "&eAccount created. Please use /login <password>."
+  register-failed:
+    - "{prefix}&cUnable to create your account."
 
-  alreadyRegistered: "&cYou already have an account."
+  # Password validation
+  password-too-short:
+    - "{prefix}&cPassword must contain at least &f{min}&c characters."
 
-  usernameTaken: "&cThat username is already registered."
+  password-too-long:
+    - "{prefix}&cPassword cannot contain more than &f{max}&c characters."
 
-  registerFailed: "&cCould not create your account."
+  password-needs-letter:
+    - "{prefix}&cPassword must contain at least one letter."
 
-  authUnavailable: "&cAuthentication service is temporarily unavailable."
+  password-needs-number:
+    - "{prefix}&cPassword must contain at least one number."
 
-  changePasswordUsage: "&cUsage: /changepassword <currentPassword> <newPassword>"
-  passwordChanged: "&aYour password has been changed successfully."
-  invalidCurrentPassword: "&cYour current password is incorrect."
-  changePasswordFailed: "&cUnable to change your password right now."
-  unregisterUsage: "&cUsage: /unregister <password>"
-  accountUnregistered: "&aYour Authiva account has been unregistered."
-  unregisterFailed: "&cUnable to unregister your account right now."
+  password-needs-symbol:
+    - "{prefix}&cPassword must contain at least one symbol."
 
-  adminOnly: "&cOnly server operators can use this command."
-  adminSetPasswordUsage: "&eUsage: /authiva setpassword <player> <newPassword>"
-  adminUnregisterUsage: "&eUsage: /authiva unregister <player>"
-  adminLogoutUsage: "&eUsage: /authiva logout <player>"
-  adminInfoUsage: "&eUsage: /authiva info <player>"
+  invalid-password-characters:
+    - "{prefix}&cYour password contains forbidden characters."
 
-  adminPasswordChanged: "&aPassword changed successfully for &f{player}&a."
-  adminAccountUnregistered: "&aAccount unregistered successfully for &f{player}&a."
-  adminPlayerLoggedOut: "&a&f{player} &ahas been logged out."
+  forbidden-password:
+    - "{prefix}&cThis password is not allowed."
 
-  adminPlayerNotRegistered: "&cThat player does not have an Authiva account."
-  adminSetPasswordFailed: "&cUnable to change that account password right now."
-  adminUnregisterFailed: "&cUnable to unregister that account right now."
-  adminLogoutFailed: "&cUnable to logout that account right now."
+  # Protection
+  movement-blocked:
+    - "{prefix}&cYou must authenticate before moving."
 
-  adminInfo: "&eAccount: &f{player} &7| &eUUID: &f{uuid} &7| &eCreated: &f{created}"
-  adminInfoFailed: "&cUnable to retrieve account information."
+  interaction-blocked:
+    - "{prefix}&cYou must authenticate before interacting."
 
-  adminListHeader: "&eAuthiva accounts:"
-  adminListEntry: "&7- &f{player}"
-  adminListFooter: "&eTotal accounts: &f{count}"
-  adminListEmpty: "&eThere are no registered Authiva accounts."
-  adminListFailed: "&cUnable to retrieve the account list."
+  attack-blocked:
+    - "{prefix}&cYou must authenticate before attacking."
 
-  adminReloaded: "&aAuthiva configuration reloaded."
-  adminHelp: "&eAuthiva admin commands:"
+  # Account management
+  change-password-usage:
+    - "{prefix}&eUsage: &f/changepassword <currentPassword> <newPassword>"
+
+  password-changed:
+    - "{prefix}&aYour password has been changed successfully."
+
+  invalid-current-password:
+    - "{prefix}&cYour current password is incorrect."
+
+  change-password-failed:
+    - "{prefix}&cUnable to change your password."
+
+  unregister-usage:
+    - "{prefix}&eUsage: &f/unregister <password>"
+
+  account-unregistered:
+    - "{prefix}&aYour Authiva account has been unregistered."
+
+  unregister-failed:
+    - "{prefix}&cUnable to unregister your account."
+
+  logout-success:
+    - "{prefix}&aYou have been logged out."
+
+  # Errors
+  auth-unavailable:
+    - "{prefix}&cAuthentication service is temporarily unavailable."
+
+  only-players:
+    - "{prefix}&cOnly players can use this command."
+
+  # Admin
+  admin-only:
+    - "{prefix}&cOnly server operators can use this command."
+
+  admin-set-password-usage:
+    - "{prefix}&eUsage: &f/authiva setpassword <player> <newPassword>"
+
+  admin-unregister-usage:
+    - "{prefix}&eUsage: &f/authiva unregister <player>"
+
+  admin-logout-usage:
+    - "{prefix}&eUsage: &f/authiva logout <player>"
+
+  admin-info-usage:
+    - "{prefix}&eUsage: &f/authiva info <player>"
+
+  admin-password-changed:
+    - "{prefix}&aPassword changed successfully for &f{player}&a."
+
+  admin-account-unregistered:
+    - "{prefix}&aAccount unregistered successfully for &f{player}&a."
+
+  admin-player-logged-out:
+    - "{prefix}&a&f{player} &ahas been logged out."
+
+  admin-player-not-registered:
+    - "{prefix}&cThat player does not have an Authiva account."
+
+  admin-set-password-failed:
+    - "{prefix}&cUnable to change that account password."
+
+  admin-unregister-failed:
+    - "{prefix}&cUnable to unregister that account."
+
+  admin-logout-failed:
+    - "{prefix}&cUnable to logout that account."
+
+  admin-info:
+    - "{prefix}&eAccount: &f{player}"
+    - "{prefix}&eUUID: &f{uuid}"
+    - "{prefix}&eCreated: &f{created}"
+
+  admin-info-failed:
+    - "{prefix}&cUnable to retrieve account information."
+
+  admin-list-header:
+    - "{prefix}&eAuthiva accounts:"
+
+  admin-list-entry:
+    - "{prefix}&7- &f{player}"
+
+  admin-list-footer:
+    - "{prefix}&eTotal accounts: &f{count}"
+
+  admin-list-empty:
+    - "{prefix}&7There are no registered Authiva accounts."
+
+  admin-list-failed:
+    - "{prefix}&cUnable to retrieve the account list."
+
+  admin-reloaded:
+    - "{prefix}&aAuthiva configuration reloaded."
+
+  admin-help:
+    - "{prefix}&eAuthiva administration commands:"

@@ -31,6 +31,10 @@ public final class AuthService {
         executor.shutdownNow();
     }
 
+    public void authenticate(UUID uuid) {
+        sessionManager.authenticate(uuid);
+    }
+
     public ExecutorService getExecutor() {
         return executor;
     }
@@ -56,6 +60,8 @@ public final class AuthService {
                 username,
                 passwordHash
         );
+
+        sessionManager.authenticate(uuid);
 
         return RegisterResult.SUCCESS;
     }
@@ -337,6 +343,10 @@ public final class AuthService {
 
     public boolean isAuthenticated(UUID uuid) {
         return sessionManager.isAuthenticated(uuid);
+    }
+
+    public AuthSessionManager getSessionManager() {
+        return sessionManager;
     }
 
     public enum RegisterResult {

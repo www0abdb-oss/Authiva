@@ -127,7 +127,7 @@ public final class RegisterCommand implements CommandExecutor {
             return true;
         }
 
-        for (String unsafe : config.getUnsafePasswords()) {
+        for (String unsafe : config.getForbiddenPasswords()) {
             if (password.equalsIgnoreCase(unsafe)) {
                 player.sendMessage(
                         config.getMessage("unsafePassword")
@@ -144,34 +144,9 @@ public final class RegisterCommand implements CommandExecutor {
                         plugin,
                         () -> {
                             switch (result) {
-                                case SUCCESS -> {
-                                    authService.loginAsync(
-                                            player.getUniqueId(),
-                                            password,
-                                            loginResult ->
-                                                    plugin.getServer()
-                                                            .getScheduler()
-                                                            .runTask(
-                                                                    plugin,
-                                                                    () -> player.sendMessage(
-                                                                            config.getMessage(
-                                                                                    "accountCreated"
-                                                                            )
-                                                                    )
-                                                            ),
-                                            exception ->
-                                                    plugin.getServer()
-                                                            .getScheduler()
-                                                            .runTask(
-                                                                    plugin,
-                                                                    () -> player.sendMessage(
-                                                                            config.getMessage(
-                                                                                    "accountCreatedLoginFailed"
-                                                                            )
-                                                                    )
-                                                            )
-                                    );
-                                }
+case SUCCESS -> player.sendMessage(
+        config.getMessage("accountCreated")
+);
 
                                 case ALREADY_REGISTERED ->
                                         player.sendMessage(

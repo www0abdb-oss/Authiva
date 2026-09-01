@@ -390,7 +390,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
             return config.getMessage("passwordNeedsSymbol");
         }
 
-        for (String unsafe : config.getUnsafePasswords()) {
+        for (String unsafe : config.getForbiddenPasswords()) {
             if (password.equalsIgnoreCase(unsafe)) {
                 return config.getMessage("unsafePassword");
             }

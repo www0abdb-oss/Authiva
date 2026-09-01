@@ -12,6 +12,10 @@ repositories {
     mavenCentral()
 
     maven {
+        name = "faststatsReleases"
+        url = uri("https://repo.faststats.dev/releases")
+    }
+    maven {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
@@ -25,6 +29,7 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.50.3.0")
 
     implementation("org.bstats:bstats-bukkit:3.2.1")
+    implementation("dev.faststats.metrics:bukkit:0.29.4")
 
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -51,13 +56,11 @@ tasks {
     }
 
     shadowJar {
-        configurations = project.configurations.runtimeClasspath.map {
-            setOf(it)
-        }
+        configurations = listOf(project.configurations.runtimeClasspath.get())
 
         dependencies {
             exclude {
-                it.moduleGroup != "org.bstats"
+                it.moduleGroup == "org.junit"
             }
         }
 

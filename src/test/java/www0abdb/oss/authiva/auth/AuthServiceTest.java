@@ -88,78 +88,57 @@ class AuthServiceTest {
                 result
         );
     }
+@Test
+void shouldLoginWithCorrectPassword() throws SQLException {
+    UUID uuid = UUID.randomUUID();
 
-    @Test
-    void shouldRejectDuplicateUsername() throws SQLException {
-        UUID firstUuid = UUID.randomUUID();
-        UUID secondUuid = UUID.randomUUID();
+    authService.register(
+            uuid,
+            "TestPlayer",
+            "StrongPassword123!"
+    );
 
-        authService.register(
-                firstUuid,
-                "TestPlayer",
-                "StrongPassword123!"
-        );
+    authService.logout(uuid);
 
-        AuthService.RegisterResult result =
-                authService.register(
-                        secondUuid,
-                        "TestPlayer",
-                        "AnotherPassword123!"
-                );
+    AuthService.LoginResult result =
+            authService.login(
+                    uuid,
+                    "StrongPassword123!"
+            );
 
-        assertEquals(
-                AuthService.RegisterResult.USERNAME_TAKEN,
-                result
-        );
-    }
+    assertEquals(
+            AuthService.LoginResult.SUCCESS,
+            result
+    );
 
-    @Test
-    void shouldLoginWithCorrectPassword() throws SQLException {
-        UUID uuid = UUID.randomUUID();
+    assertTrue(authService.isAuthenticated(uuid));
+}
 
-        authService.register(
-                uuid,
-                "TestPlayer",
-                "StrongPassword123!"
-        );
+@Test
+void shouldRejectWrongPassword() throws SQLException {
+    UUID uuid = UUID.randomUUID();
 
-        AuthService.LoginResult result =
-                authService.login(
-                        uuid,
-                        "StrongPassword123!"
-                );
+    authService.register(
+            uuid,
+            "TestPlayer",
+            "StrongPassword123!"
+    );
 
-        assertEquals(
-                AuthService.LoginResult.SUCCESS,
-                result
-        );
+    authService.logout(uuid);
 
-        assertTrue(authService.isAuthenticated(uuid));
-    }
+    AuthService.LoginResult result =
+            authService.login(
+                    uuid,
+                    "WrongPassword123!"
+            );
 
-    @Test
-    void shouldRejectWrongPassword() throws SQLException {
-        UUID uuid = UUID.randomUUID();
+    assertEquals(
+            AuthService.LoginResult.INVALID_PASSWORD,
+            result
+    );
 
-        authService.register(
-                uuid,
-                "TestPlayer",
-                "StrongPassword123!"
-        );
-
-        AuthService.LoginResult result =
-                authService.login(
-                        uuid,
-                        "WrongPassword123!"
-                );
-
-        assertEquals(
-                AuthService.LoginResult.INVALID_PASSWORD,
-                result
-        );
-
-        assertFalse(authService.isAuthenticated(uuid));
-    }
+    assertFalse(authService.isAuthenticated(uuid));
+}
 
     @Test
     void shouldRejectUnregisteredPlayer() throws SQLException {

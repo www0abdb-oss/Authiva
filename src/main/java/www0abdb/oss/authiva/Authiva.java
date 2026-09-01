@@ -1,6 +1,7 @@
 package www0abdb.oss.authiva;
 
 import org.bstats.bukkit.Metrics;
+import dev.faststats.bukkit.BukkitContext;
 import org.bukkit.plugin.java.JavaPlugin;
 import www0abdb.oss.authiva.auth.AuthListener;
 import www0abdb.oss.authiva.auth.AuthService;
@@ -13,6 +14,7 @@ import www0abdb.oss.authiva.commands.LogoutCommand;
 import www0abdb.oss.authiva.commands.RegisterCommand;
 import www0abdb.oss.authiva.database.AccountRepository;
 import www0abdb.oss.authiva.database.DatabaseManager;
+import www0abdb.oss.authiva.update.UpdateChecker;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -23,6 +25,14 @@ public final class Authiva extends JavaPlugin {
 
     private DatabaseManager databaseManager;
     private AuthService authService;
+    private final BukkitContext fastStats =
+            new BukkitContext.Factory(
+                    this,
+                    "b1cbccbceea067a574b8175a02c0b833"
+            )
+                    .metrics(dev.faststats.Metrics.Factory::create)
+                    .create();
+
 
     @Override
     public void onEnable() {
@@ -60,7 +70,11 @@ public final class Authiva extends JavaPlugin {
         AuthivaConfig authivaConfig = new AuthivaConfig(this);
 
         getServer().getPluginManager().registerEvents(
-                new AuthListener(authService, authivaConfig),
+                new AuthListener(
+                        authService,
+                        authivaConfig,
+                        this
+                ),
                 this
         );
 
@@ -111,11 +125,21 @@ public final class Authiva extends JavaPlugin {
 
         new Metrics(this, 33742);
 
-        getLogger().info("Authiva enabled.");
+        fastStats.ready();
+
+        getLogger().info("Authiva is running on Paper");
+        getLogger().info("Authiva has been enabled successfully!");
+        getLogger().info("GitHub: https://github.com/www0abdb-oss/Authiva");
+
+        if (authivaConfig.checkForUpdates()) {
+            new UpdateChecker(this).check();
+        }
+
     }
 
     @Override
     public void onDisable() {
+        fastStats.shutdown();
         if (authService != null) {
             authService.shutdown();
         }

@@ -19,7 +19,10 @@ class PasswordHasherTest {
         String hash = PasswordHasher.hash("CorrectPassword123!");
 
         assertFalse(
-                PasswordHasher.verify("WrongPassword123!", hash)
+                PasswordHasher.verify(
+                        "WrongPassword123!",
+                        hash
+                )
         );
     }
 
@@ -45,4 +48,53 @@ class PasswordHasherTest {
                 )
         );
     }
+
+    @Test
+    void hashShouldContainExpectedFormat() {
+        String hash = PasswordHasher.hash("FormatTest123!");
+
+        String[] parts = hash.split("\\$", 4);
+
+        assertEquals(3, parts.length);
+        assertEquals("sha256", parts[0]);
+        assertFalse(parts[1].isBlank());
+        assertFalse(parts[2].isBlank());
+    }
+@Test
+void measurePasswordHashPerformance() {
+    String password = "PerformanceTest123!";
+    int runs = 3;
+
+    long totalHashTime = 0;
+    long totalVerifyTime = 0;
+
+    for (int i = 0; i < runs; i++) {
+        long hashStart = System.nanoTime();
+
+        String hash = PasswordHasher.hash(password);
+
+        totalHashTime += System.nanoTime() - hashStart;
+
+        long verifyStart = System.nanoTime();
+
+        boolean verified = PasswordHasher.verify(password, hash);
+
+        totalVerifyTime += System.nanoTime() - verifyStart;
+
+        assertTrue(verified);
+    }
+
+    long averageHashMs =
+            totalHashTime / runs / 1_000_000;
+
+    long averageVerifyMs =
+            totalVerifyTime / runs / 1_000_000;
+
+    System.out.printf(
+            "PasswordHasher benchmark: runs=%d, hash_avg=%d ms, verify_avg=%d ms%n",
+            runs,
+            averageHashMs,
+            averageVerifyMs
+    );
+}
 }
