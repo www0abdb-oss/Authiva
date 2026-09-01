@@ -182,7 +182,8 @@ Lightweight and configurable authentication plugin for Paper servers.
 
 ---
 
-https://bstats.org/plugin/bukkit/Authiva/33742
+![Graph](https://bstats.org/signatures/bukkit/Authiva.svg)
+
 
 <a href="https://hangar.papermc.io/www0abdb-oss/Authiva">Hangar</a>
  •  <a href="https://github.com/www0abdb-oss/Authiva">Source Code</a>
