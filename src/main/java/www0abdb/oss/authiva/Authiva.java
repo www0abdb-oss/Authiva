@@ -1,7 +1,6 @@
 package www0abdb.oss.authiva;
 
 import org.bstats.bukkit.Metrics;
-import dev.faststats.bukkit.BukkitContext;
 import org.bukkit.plugin.java.JavaPlugin;
 import www0abdb.oss.authiva.auth.AuthListener;
 import www0abdb.oss.authiva.auth.AuthService;
@@ -25,14 +24,6 @@ public final class Authiva extends JavaPlugin {
 
     private DatabaseManager databaseManager;
     private AuthService authService;
-    private final BukkitContext fastStats =
-            new BukkitContext.Factory(
-                    this,
-                    "b1cbccbceea067a574b8175a02c0b833"
-            )
-                    .metrics(dev.faststats.Metrics.Factory::create)
-                    .create();
-
 
     @Override
     public void onEnable() {
@@ -125,8 +116,6 @@ public final class Authiva extends JavaPlugin {
 
         new Metrics(this, 33742);
 
-        fastStats.ready();
-
         getLogger().info("Authiva is running on Paper");
         getLogger().info("Authiva has been enabled successfully!");
         getLogger().info("GitHub: https://github.com/www0abdb-oss/Authiva");
@@ -139,7 +128,6 @@ public final class Authiva extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        fastStats.shutdown();
         if (authService != null) {
             authService.shutdown();
         }

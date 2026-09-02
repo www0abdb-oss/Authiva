@@ -12,10 +12,6 @@ repositories {
     mavenCentral()
 
     maven {
-        name = "faststatsReleases"
-        url = uri("https://repo.faststats.dev/releases")
-    }
-    maven {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
@@ -27,9 +23,7 @@ dependencies {
     )
 
     implementation("org.xerial:sqlite-jdbc:3.50.3.0")
-
     implementation("org.bstats:bstats-bukkit:3.2.1")
-    implementation("dev.faststats.metrics:bukkit:0.29.4")
 
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -53,8 +47,14 @@ tasks {
 
     jar {
         archiveBaseName.set("Authiva")
+        archiveClassifier.set("plain")
     }
 
+    // ------------------------------------------------------------
+    // Standard
+    // Desktop/server platforms:
+    // Linux glibc, Windows and macOS
+    // ------------------------------------------------------------
     shadowJar {
         configurations = listOf(project.configurations.runtimeClasspath.get())
 
@@ -69,13 +69,125 @@ tasks {
             "${project.group}.libs.bstats"
         )
 
+        exclude("org/sqlite/native/FreeBSD/**")
+        exclude("org/sqlite/native/Linux-Android/**")
+        exclude("org/sqlite/native/Linux-Musl/**")
+        exclude("org/sqlite/native/Linux/ppc64/**")
+        exclude("org/sqlite/native/Linux/riscv64/**")
+
         archiveBaseName.set("Authiva")
+        archiveClassifier.set("")
+    }
+
+    // ------------------------------------------------------------
+    // Linux
+    // Linux native libraries
+    // ------------------------------------------------------------
+    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarLinux") {
+        configurations = listOf(project.configurations.runtimeClasspath.get())
+
+        dependencies {
+            exclude {
+                it.moduleGroup == "org.junit"
+            }
+        }
+
+        relocate(
+            "org.bstats",
+            "${project.group}.libs.bstats"
+        )
+
+        // Remove non-Linux SQLite natives
+        exclude("org/sqlite/native/FreeBSD/**")
+        exclude("org/sqlite/native/Linux-Android/**")
+        exclude("org/sqlite/native/Linux-Musl/**")
+        exclude("org/sqlite/native/Mac/**")
+        exclude("org/sqlite/native/Windows/**")
+
+        archiveBaseName.set("Authiva")
+        archiveClassifier.set("linux")
+    }
+
+    // ------------------------------------------------------------
+    // Minimal
+    // Linux x86_64 only
+    // ------------------------------------------------------------
+    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarMinimal") {
+        configurations = listOf(project.configurations.runtimeClasspath.get())
+
+        dependencies {
+            exclude {
+                it.moduleGroup == "org.junit"
+            }
+        }
+
+        relocate(
+            "org.bstats",
+            "${project.group}.libs.bstats"
+        )
+
+        // Keep only Linux x86_64 SQLite native library
+        exclude("org/sqlite/native/FreeBSD/**")
+        exclude("org/sqlite/native/Linux-Android/**")
+        exclude("org/sqlite/native/Linux-Musl/**")
+        exclude("org/sqlite/native/Linux/aarch64/**")
+        exclude("org/sqlite/native/Linux/arm/**")
+        exclude("org/sqlite/native/Linux/armv6/**")
+        exclude("org/sqlite/native/Linux/armv7/**")
+        exclude("org/sqlite/native/Linux/ppc64/**")
+        exclude("org/sqlite/native/Linux/riscv64/**")
+        exclude("org/sqlite/native/Linux/x86/**")
+        exclude("org/sqlite/native/Mac/**")
+        exclude("org/sqlite/native/Windows/**")
+
+        archiveBaseName.set("Authiva")
+        archiveClassifier.set("minimal")
+    }
+
+    // ------------------------------------------------------------
+    // Full
+    // ALL SQLite native libraries / ALL supported platforms
+    // ------------------------------------------------------------
+    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarFull") {
+        configurations = listOf(project.configurations.runtimeClasspath.get())
+
+        dependencies {
+            exclude {
+                it.moduleGroup == "org.junit"
+            }
+        }
+
+        relocate(
+            "org.bstats",
+            "${project.group}.libs.bstats"
+        )
+
+        // IMPORTANT:
+        // No SQLite native exclusions here.
+        // This keeps all SQLite natives:
+        // Linux
+        // Linux-Android
+        // Linux-Musl
+        // Windows
+        // Mac
+        // FreeBSD
+        // PPC64
+        // RISC-V
+        //
+        // Full build is expected to be larger than 10 MB.
+
+        archiveBaseName.set("Authiva")
+        archiveClassifier.set("full")
     }
 
     build {
         dependsOn(shadowJar)
+        dependsOn("shadowJarLinux")
+        dependsOn("shadowJarMinimal")
+        dependsOn("shadowJarFull")
     }
 }
+
 tasks.processResources {
     val props = mapOf("version" to project.version)
     inputs.properties(props)
