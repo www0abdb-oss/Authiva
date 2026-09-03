@@ -32,7 +32,7 @@ public final class DatabaseManager implements AutoCloseable {
     }
 
     private void createTables() throws SQLException {
-        String sql = """
+        String accountsSql = """
                 CREATE TABLE IF NOT EXISTS accounts (
                     uuid TEXT PRIMARY KEY,
                     username TEXT NOT NULL UNIQUE,
@@ -41,8 +41,20 @@ public final class DatabaseManager implements AutoCloseable {
                 )
                 """;
 
+        String sessionsSql = """
+                CREATE TABLE IF NOT EXISTS sessions (
+                    uuid TEXT PRIMARY KEY,
+                    token_hash TEXT NOT NULL UNIQUE,
+                    created_at INTEGER NOT NULL,
+                    expires_at INTEGER NOT NULL,
+                    FOREIGN KEY (uuid) REFERENCES accounts(uuid)
+                        ON DELETE CASCADE
+                )
+                """;
+
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(sql);
+            statement.executeUpdate(accountsSql);
+            statement.executeUpdate(sessionsSql);
         }
     }
 

@@ -1,17 +1,24 @@
 package www0abdb.oss.authiva.auth;
 
 import www0abdb.oss.authiva.database.AccountRepository;
+import www0abdb.oss.authiva.database.SessionRepository;
+import www0abdb.oss.authiva.config.AuthivaConfig;
 import www0abdb.oss.authiva.security.PasswordHasher;
 
 import java.sql.SQLException;
 import java.util.UUID;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class AuthService {
 
     private final AccountRepository accountRepository;
+    private final SessionRepository sessionRepository;
     private final AuthSessionManager sessionManager;
+    private final AuthivaConfig config;
+    private final SecureRandom secureRandom = new SecureRandom();
     private final ExecutorService executor =
             Executors.newSingleThreadExecutor(r -> {
                 Thread thread = new Thread(r, "Authiva-Worker");
@@ -21,10 +28,14 @@ public final class AuthService {
 
     public AuthService(
             AccountRepository accountRepository,
-            AuthSessionManager sessionManager
+            SessionRepository sessionRepository,
+            AuthSessionManager sessionManager,
+            AuthivaConfig config
     ) {
         this.accountRepository = accountRepository;
+        this.sessionRepository = sessionRepository;
         this.sessionManager = sessionManager;
+        this.config = config;
     }
 
     public void shutdown() {
@@ -32,6 +43,78 @@ public final class AuthService {
     }
 
     public void authenticate(UUID uuid) {
+        sessionManager.authenticate(uuid);
+    }
+
+    private void createPersistentSession(UUID uuid) throws SQLException {
+        if (!config.isSessionEnabled()) {
+            return;
+        }
+
+        long createdAt = System.currentTimeMillis();
+        long expiresAt = createdAt + config.getSessionDuration();
+
+        byte[] token = new byte[32];
+        secureRandom.nextBytes(token);
+
+        String tokenHash = hashToken(token);
+
+        sessionRepository.save(
+                uuid,
+                tokenHash,
+                createdAt,
+                expiresAt
+        );
+    }
+
+    private String hashToken(byte[] token) {
+        try {
+            byte[] hash = MessageDigest.getInstance("SHA-256")
+                    .digest(token);
+
+            StringBuilder result = new StringBuilder(hash.length * 2);
+
+            for (byte value : hash) {
+                result.append(String.format("%02x", value));
+            }
+
+            return result.toString();
+        } catch (java.security.NoSuchAlgorithmException exception) {
+            throw new IllegalStateException(
+                    "SHA-256 is not available.",
+                    exception
+            );
+        }
+    }
+
+    public boolean restorePersistentSession(UUID uuid)
+            throws SQLException {
+
+        if (!config.isSessionEnabled()) {
+            return false;
+        }
+
+        var session = sessionRepository.findByUuid(uuid);
+
+        if (session.isEmpty()) {
+            return false;
+        }
+
+        var record = session.get();
+
+        if (record.expiresAt() <= System.currentTimeMillis()) {
+            sessionRepository.delete(uuid);
+            return false;
+        }
+
+        sessionManager.authenticate(uuid);
+        return true;
+    }
+
+    private void saveSessionAfterAuthentication(UUID uuid)
+            throws SQLException {
+
+        createPersistentSession(uuid);
         sessionManager.authenticate(uuid);
     }
 
@@ -61,7 +144,7 @@ public final class AuthService {
                 passwordHash
         );
 
-        sessionManager.authenticate(uuid);
+        saveSessionAfterAuthentication(uuid);
 
         return RegisterResult.SUCCESS;
     }
@@ -89,7 +172,7 @@ public final class AuthService {
         }
 
 
-        sessionManager.authenticate(uuid);
+        saveSessionAfterAuthentication(uuid);
         return LoginResult.SUCCESS;
     }
 
@@ -339,6 +422,15 @@ public final class AuthService {
 
     public void logout(UUID uuid) {
         sessionManager.unauthenticate(uuid);
+
+        try {
+            sessionRepository.delete(uuid);
+        } catch (SQLException exception) {
+            throw new IllegalStateException(
+                    "Failed to delete persistent session.",
+                    exception
+            );
+        }
     }
 
     public boolean isAuthenticated(UUID uuid) {

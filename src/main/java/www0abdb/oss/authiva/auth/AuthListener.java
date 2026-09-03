@@ -2,6 +2,8 @@ package www0abdb.oss.authiva.auth;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -61,7 +63,20 @@ public final class AuthListener implements Listener {
             boolean registered =
                     authService.hasAccount(uuid);
 
-            startAuthenticationTimer(player);
+            if (registered && authService.restorePersistentSession(uuid)) {
+                return;
+            }
+
+            player.addPotionEffect(new PotionEffect(
+                    PotionEffectType.BLINDNESS,
+                    Integer.MAX_VALUE,
+                    0,
+                    false,
+                    false,
+                    false
+            ));
+
+            startAuthenticationTimer(player, registered);
 
             if (config.sendReminderOnJoin()) {
 
@@ -95,7 +110,10 @@ public final class AuthListener implements Listener {
         }
     }
 
-    private void startAuthenticationTimer(Player player) {
+    private void startAuthenticationTimer(
+            Player player,
+            boolean registered
+    ) {
 
         UUID uuid = player.getUniqueId();
 
@@ -166,11 +184,11 @@ public final class AuthListener implements Listener {
 
                                             send(
                                                     player,
-                                                    "reminder-with-time",
+                                                    registered
+                                                            ? "login-reminder-with-time"
+                                                            : "register-reminder-with-time",
                                                     "{seconds}",
-                                                    String.valueOf(
-                                                            remaining
-                                                    )
+                                                    String.valueOf(remaining)
                                             );
                                         }
                                     }
@@ -430,7 +448,7 @@ public final class AuthListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
 
-        authService.logout(
+        authService.getSessionManager().remove(
                 event.getPlayer().getUniqueId()
         );
     }

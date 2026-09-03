@@ -24,14 +24,15 @@ public final class AuthivaConfig {
         reload();
     }
 
-    public void reload() {
-        plugin.saveDefaultConfig();
-        plugin.reloadConfig();
+public void reload() {
+    plugin.saveDefaultConfig();
+    plugin.reloadConfig();
 
-        this.config = plugin.getConfig();
+    this.config = plugin.getConfig();
 
-        rebuildAllowCommands();
-    }
+    rebuildAllowCommands();
+    validateConfiguration();
+}
 
     private void rebuildAllowCommands() {
         Set<String> commands = new HashSet<>();
@@ -69,6 +70,139 @@ public final class AuthivaConfig {
         allowCommands =
                 Collections.unmodifiableSet(commands);
     }
+
+private void validateConfiguration() {
+
+    boolean valid = true;
+
+    int timeout = config.getInt(
+            "authentication.login-timeout",
+            60
+    );
+
+    if (timeout <= 0) {
+        plugin.getLogger().severe(
+                "Configuration error: authentication.login-timeout " +
+                "must be greater than 0."
+        );
+        valid = false;
+    }
+
+    int maxAttempts = config.getInt(
+            "authentication.max-login-attempts",
+            5
+    );
+
+    if (maxAttempts <= 0) {
+        plugin.getLogger().severe(
+                "Configuration error: authentication.max-login-attempts " +
+                "must be greater than 0."
+        );
+        valid = false;
+    }
+
+    int minPassword = config.getInt(
+            "authentication.password-min-length",
+            8
+    );
+
+    int maxPassword = config.getInt(
+            "authentication.password-max-length",
+            32
+    );
+
+    if (minPassword <= 0) {
+        plugin.getLogger().severe(
+                "Configuration error: authentication.password-min-length " +
+                "must be greater than 0."
+        );
+        valid = false;
+    }
+
+    if (maxPassword <= 0) {
+        plugin.getLogger().severe(
+                "Configuration error: authentication.password-max-length " +
+                "must be greater than 0."
+        );
+        valid = false;
+    }
+
+    if (minPassword > maxPassword) {
+        plugin.getLogger().severe(
+                "Configuration error: authentication.password-min-length " +
+                "cannot be greater than authentication.password-max-length."
+        );
+        valid = false;
+    }
+
+    String storageType = config.getString(
+            "storage.type",
+            "sqlite"
+    );
+
+    if (storageType == null ||
+            !storageType.equalsIgnoreCase("sqlite")) {
+
+        plugin.getLogger().severe(
+                "Configuration error: storage.type must be 'sqlite'."
+        );
+        valid = false;
+    }
+
+    String duration = config.getString(
+            "session.duration",
+            "3d"
+    );
+
+    if (!isValidDuration(duration)) {
+        plugin.getLogger().severe(
+                "Configuration error: session.duration has invalid value: '" +
+                duration + "'."
+        );
+
+        plugin.getLogger().severe(
+                "Expected a duration such as 30s, 10m, 2h, or 3d."
+        );
+
+        valid = false;
+    }
+
+    if (valid) {
+        plugin.getLogger().info(
+                "Configuration validated successfully."
+        );
+    }
+}
+
+private boolean isValidDuration(String duration) {
+
+    if (duration == null || duration.isBlank()) {
+        return false;
+    }
+
+    String value = duration.trim()
+            .toLowerCase(Locale.ROOT);
+
+    char unit = value.charAt(value.length() - 1);
+
+    if (unit != 's' &&
+            unit != 'm' &&
+            unit != 'h' &&
+            unit != 'd') {
+        return false;
+    }
+
+    String number = value.substring(
+            0,
+            value.length() - 1
+    ).trim();
+
+    try {
+        return Long.parseLong(number) > 0;
+    } catch (NumberFormatException exception) {
+        return false;
+    }
+}
 
     public int getTimeout() {
         return config.getInt(
@@ -117,6 +251,46 @@ public final class AuthivaConfig {
                 true
         );
     }
+
+    public boolean isSessionEnabled() {
+        return config.getBoolean(
+                "session.enabled",
+                true
+        );
+    }
+
+public long getSessionDuration() {
+
+    String duration = config.getString(
+            "session.duration",
+            "3d"
+    );
+
+    if (!isValidDuration(duration)) {
+        return 3L * 24L * 60L * 60L * 1000L;
+    }
+
+    String value = duration.trim()
+            .toLowerCase(Locale.ROOT);
+
+    long multiplier;
+
+    switch (value.charAt(value.length() - 1)) {
+        case 'd' -> multiplier = 24L * 60L * 60L * 1000L;
+        case 'h' -> multiplier = 60L * 60L * 1000L;
+        case 'm' -> multiplier = 60L * 1000L;
+        case 's' -> multiplier = 1000L;
+        default -> throw new IllegalStateException(
+                "Invalid session duration."
+        );
+    }
+
+    long amount = Long.parseLong(
+            value.substring(0, value.length() - 1).trim()
+    );
+
+    return Math.multiplyExact(amount, multiplier);
+}
 
     public int getMinPasswordLength() {
         return config.getInt(

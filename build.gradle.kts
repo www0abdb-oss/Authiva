@@ -15,6 +15,11 @@ repositories {
         name = "papermc"
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
+    maven {
+        name = "faststatsReleases"
+        url = uri("https://repo.faststats.dev/releases")
+    }
+
 }
 
 dependencies {
@@ -22,6 +27,7 @@ dependencies {
         project.property("paperApiVersion") as String
     )
 
+    implementation("dev.faststats.metrics:bukkit:0.30.0")
     implementation("org.xerial:sqlite-jdbc:3.50.3.0")
     implementation("org.bstats:bstats-bukkit:3.2.1")
 
@@ -45,7 +51,12 @@ tasks {
         useJUnitPlatform()
     }
 
+    // ------------------------------------------------------------
+    // Plain JAR
+    // ------------------------------------------------------------
     jar {
+        from(sourceSets.main.get().output)
+
         archiveBaseName.set("Authiva")
         archiveClassifier.set("plain")
     }
@@ -56,7 +67,15 @@ tasks {
     // Linux glibc, Windows and macOS
     // ------------------------------------------------------------
     shadowJar {
-        configurations = listOf(project.configurations.runtimeClasspath.get())
+        dependsOn(processResources)
+
+        from(processResources)
+
+        from(sourceSets.main.get().output)
+
+        configurations = listOf(
+            project.configurations.runtimeClasspath.get()
+        )
 
         dependencies {
             exclude {
@@ -75,6 +94,9 @@ tasks {
         exclude("org/sqlite/native/Linux/ppc64/**")
         exclude("org/sqlite/native/Linux/riscv64/**")
 
+        // Backup file must not be distributed
+        exclude("config.yml.bak")
+
         archiveBaseName.set("Authiva")
         archiveClassifier.set("")
     }
@@ -83,8 +105,20 @@ tasks {
     // Linux
     // Linux native libraries
     // ------------------------------------------------------------
-    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarLinux") {
-        configurations = listOf(project.configurations.runtimeClasspath.get())
+    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>(
+        "shadowJarLinux"
+    ) {
+        dependsOn(processResources)
+
+        from(processResources)
+
+        from(sourceSets.main.get().output)
+
+
+
+        configurations = listOf(
+            project.configurations.runtimeClasspath.get()
+        )
 
         dependencies {
             exclude {
@@ -104,6 +138,9 @@ tasks {
         exclude("org/sqlite/native/Mac/**")
         exclude("org/sqlite/native/Windows/**")
 
+        // Backup file must not be distributed
+        exclude("config.yml.bak")
+
         archiveBaseName.set("Authiva")
         archiveClassifier.set("linux")
     }
@@ -112,8 +149,18 @@ tasks {
     // Minimal
     // Linux x86_64 only
     // ------------------------------------------------------------
-    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarMinimal") {
-        configurations = listOf(project.configurations.runtimeClasspath.get())
+    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>(
+        "shadowJarMinimal"
+    ) {
+        dependsOn(processResources)
+
+        from(processResources)
+
+        from(sourceSets.main.get().output)
+
+        configurations = listOf(
+            project.configurations.runtimeClasspath.get()
+        )
 
         dependencies {
             exclude {
@@ -140,6 +187,9 @@ tasks {
         exclude("org/sqlite/native/Mac/**")
         exclude("org/sqlite/native/Windows/**")
 
+        // Backup file must not be distributed
+        exclude("config.yml.bak")
+
         archiveBaseName.set("Authiva")
         archiveClassifier.set("minimal")
     }
@@ -148,8 +198,18 @@ tasks {
     // Full
     // ALL SQLite native libraries / ALL supported platforms
     // ------------------------------------------------------------
-    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarFull") {
-        configurations = listOf(project.configurations.runtimeClasspath.get())
+    register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>(
+        "shadowJarFull"
+    ) {
+        dependsOn(processResources)
+
+        from(processResources)
+
+        from(sourceSets.main.get().output)
+
+        configurations = listOf(
+            project.configurations.runtimeClasspath.get()
+        )
 
         dependencies {
             exclude {
@@ -162,7 +222,6 @@ tasks {
             "${project.group}.libs.bstats"
         )
 
-        // IMPORTANT:
         // No SQLite native exclusions here.
         // This keeps all SQLite natives:
         // Linux
@@ -173,13 +232,17 @@ tasks {
         // FreeBSD
         // PPC64
         // RISC-V
-        //
-        // Full build is expected to be larger than 10 MB.
+
+        // Backup file must not be distributed
+        exclude("config.yml.bak")
 
         archiveBaseName.set("Authiva")
         archiveClassifier.set("full")
     }
 
+    // ------------------------------------------------------------
+    // Build all distributable JARs
+    // ------------------------------------------------------------
     build {
         dependsOn(shadowJar)
         dependsOn("shadowJarLinux")
@@ -188,8 +251,16 @@ tasks {
     }
 }
 
+
+
+// ------------------------------------------------------------
+// Process resources
+// ------------------------------------------------------------
 tasks.processResources {
-    val props = mapOf("version" to project.version)
+    val props = mapOf(
+        "version" to project.version
+    )
+
     inputs.properties(props)
 
     filesMatching("plugin.yml") {

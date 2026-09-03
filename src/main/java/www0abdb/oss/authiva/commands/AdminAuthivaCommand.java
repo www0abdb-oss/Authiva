@@ -37,7 +37,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
             String[] args
     ) {
         if (!sender.isOp()) {
-            sender.sendMessage(config.getMessage("adminOnly"));
+            sender.sendMessage(config.getMessage("admin-only"));
             return true;
         }
 
@@ -62,7 +62,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
     private void handleSetPassword(CommandSender sender, String[] args) {
         if (args.length != 3) {
-            sender.sendMessage(config.getMessage("adminSetPasswordUsage"));
+            sender.sendMessage(config.getMessage("admin-set-password-usage"));
             return;
         }
 
@@ -81,9 +81,9 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                 newPassword,
                 result -> runSync(() -> {
                     String key = switch (result) {
-                        case SUCCESS -> "adminPasswordChanged";
-                        case NOT_REGISTERED -> "adminPlayerNotRegistered";
-                        case FAILED -> "adminSetPasswordFailed";
+                        case SUCCESS -> "admin-password-changed";
+                        case NOT_REGISTERED -> "admin-player-not-registered";
+                        case FAILED -> "admin-set-password-failed";
                     };
 
                     sender.sendMessage(
@@ -96,7 +96,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                 }),
                 exception -> runSync(() -> {
                     sender.sendMessage(
-                            config.getMessage("adminSetPasswordFailed")
+                            config.getMessage("admin-set-password-failed")
                     );
 
                     plugin.getLogger().warning(
@@ -111,7 +111,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
     private void handleUnregister(CommandSender sender, String[] args) {
         if (args.length != 2) {
-            sender.sendMessage(config.getMessage("adminUnregisterUsage"));
+            sender.sendMessage(config.getMessage("admin-unregister-usage"));
             return;
         }
 
@@ -121,9 +121,9 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                 username,
                 result -> runSync(() -> {
                     String key = switch (result) {
-                        case SUCCESS -> "adminAccountUnregistered";
-                        case NOT_REGISTERED -> "adminPlayerNotRegistered";
-                        case FAILED -> "adminUnregisterFailed";
+                        case SUCCESS -> "admin-account-unregistered";
+                        case NOT_REGISTERED -> "admin-player-not-registered";
+                        case FAILED -> "admin-unregister-failed";
                     };
 
                     sender.sendMessage(
@@ -136,7 +136,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                 }),
                 exception -> runSync(() -> {
                     sender.sendMessage(
-                            config.getMessage("adminUnregisterFailed")
+                            config.getMessage("admin-unregister-failed")
                     );
 
                     plugin.getLogger().warning(
@@ -151,7 +151,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
     private void handleLogout(CommandSender sender, String[] args) {
         if (args.length != 2) {
-            sender.sendMessage(config.getMessage("adminLogoutUsage"));
+            sender.sendMessage(config.getMessage("admin-logout-usage"));
             return;
         }
 
@@ -163,7 +163,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                     switch (result) {
                         case SUCCESS -> sender.sendMessage(
                                 config.getMessage(
-                                        "adminPlayerLoggedOut",
+                                        "admin-player-logged-out",
                                         "{player}",
                                         username
                                 )
@@ -171,14 +171,14 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
                         case NOT_REGISTERED -> sender.sendMessage(
                                 config.getMessage(
-                                        "adminPlayerNotRegistered"
+                                        "admin-player-not-registered"
                                 )
                         );
                     }
                 }),
                 exception -> runSync(() -> {
                     sender.sendMessage(
-                            config.getMessage("adminLogoutFailed")
+                            config.getMessage("admin-logout-failed")
                     );
 
                     plugin.getLogger().warning(
@@ -193,7 +193,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
     private void handleInfo(CommandSender sender, String[] args) {
         if (args.length != 2) {
-            sender.sendMessage(config.getMessage("adminInfoUsage"));
+            sender.sendMessage(config.getMessage("admin-info-usage"));
             return;
         }
 
@@ -211,7 +211,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                                     if (account.isEmpty()) {
                                         sender.sendMessage(
                                                 config.getMessage(
-                                                        "adminPlayerNotRegistered"
+                                                        "admin-player-not-registered"
                                                 )
                                         );
                                         return;
@@ -229,7 +229,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
                                     sender.sendMessage(
                                             config.getMessage(
-                                                    "adminInfo",
+                                                    "admin-info",
                                                     "{player}",
                                                     record.username(),
                                                     "{uuid}",
@@ -245,7 +245,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                                 plugin,
                                 () -> sender.sendMessage(
                                         config.getMessage(
-                                                "adminInfoFailed"
+                                                "admin-info-failed"
                                         )
                                 )
                         );
@@ -275,7 +275,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                                     if (accounts.isEmpty()) {
                                         sender.sendMessage(
                                                 config.getMessage(
-                                                        "adminListEmpty"
+                                                        "admin-list-empty"
                                                 )
                                         );
                                         return;
@@ -283,7 +283,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
                                     sender.sendMessage(
                                             config.getMessage(
-                                                    "adminListHeader"
+                                                    "admin-list-header"
                                             )
                                     );
 
@@ -293,7 +293,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                                     ) {
                                         sender.sendMessage(
                                                 config.getMessage(
-                                                        "adminListEntry",
+                                                        "admin-list-entry",
                                                         "{player}",
                                                         account.username()
                                                 )
@@ -302,7 +302,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
                                     sender.sendMessage(
                                             config.getMessage(
-                                                    "adminListFooter",
+                                                    "admin-list-footer",
                                                     "{count}",
                                                     String.valueOf(
                                                             accounts.size()
@@ -316,7 +316,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
                                 plugin,
                                 () -> sender.sendMessage(
                                         config.getMessage(
-                                                "adminListFailed"
+                                                "admin-list-failed"
                                         )
                                 )
                         );
@@ -334,7 +334,7 @@ public final class AdminAuthivaCommand implements CommandExecutor {
         config.reload();
 
         sender.sendMessage(
-                config.getMessage("adminReloaded")
+                config.getMessage("admin-reloaded")
         );
     }
 
@@ -360,39 +360,39 @@ public final class AdminAuthivaCommand implements CommandExecutor {
 
         if (!config.allowLetters()
                 && password.chars().anyMatch(Character::isLetter)) {
-            return config.getMessage("invalidPasswordCharacters");
+            return config.getMessage("invalid-password-characters");
         }
 
         if (!config.allowNumbers()
                 && password.chars().anyMatch(Character::isDigit)) {
-            return config.getMessage("invalidPasswordCharacters");
+            return config.getMessage("invalid-password-characters");
         }
 
         if (!config.allowSymbols()
                 && password.chars().anyMatch(
                 c -> !Character.isLetterOrDigit(c))) {
-            return config.getMessage("invalidPasswordCharacters");
+            return config.getMessage("invalid-password-characters");
         }
 
         if (config.requireLetter()
                 && password.chars().noneMatch(Character::isLetter)) {
-            return config.getMessage("passwordNeedsLetter");
+            return config.getMessage("password-needs-letter");
         }
 
         if (config.requireNumber()
                 && password.chars().noneMatch(Character::isDigit)) {
-            return config.getMessage("passwordNeedsNumber");
+            return config.getMessage("password-needs-number");
         }
 
         if (config.requireSymbol()
                 && password.chars().allMatch(
                 Character::isLetterOrDigit)) {
-            return config.getMessage("passwordNeedsSymbol");
+            return config.getMessage("password-needs-symbol");
         }
 
         for (String unsafe : config.getForbiddenPasswords()) {
             if (password.equalsIgnoreCase(unsafe)) {
-                return config.getMessage("unsafePassword");
+                return config.getMessage("unsafe-password");
             }
         }
 
@@ -404,6 +404,6 @@ public final class AdminAuthivaCommand implements CommandExecutor {
     }
 
     private void sendHelp(CommandSender sender) {
-        sender.sendMessage(config.getMessage("adminHelp"));
+        sender.sendMessage(config.getMessage("admin-help"));
     }
 }

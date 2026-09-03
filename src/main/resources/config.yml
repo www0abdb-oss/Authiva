@@ -27,6 +27,10 @@ authentication:
   # Automatically authenticate after successful registration.
   auto-login-after-register: true
 
+session:
+  enabled: true
+  duration: 3d
+
 
 # ============================================================
 # Password
@@ -355,3 +359,10 @@ messages:
 
   admin-help:
     - "{prefix}&eAuthiva administration commands:"
+    - "&7/authiva setpassword <player> <password> &f- Change a player's password"
+    - "&7/authiva unregister <player> &f- Delete a player's account"
+    - "&7/authiva logout <player> &f- Log a player out"
+    - "&7/authiva info <player> &f- Show account information"
+    - "&7/authiva list &f- List registered accounts"
+    - "&7/authiva reload &f- Reload Authiva configuration"
+    - "&7/authiva help &f- Show this help"

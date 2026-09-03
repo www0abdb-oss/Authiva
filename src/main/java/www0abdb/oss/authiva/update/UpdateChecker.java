@@ -1,6 +1,7 @@
 package www0abdb.oss.authiva.update;
 
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,20 +19,41 @@ public final class UpdateChecker {
     private static final String RELEASES_URL =
             "https://github.com/www0abdb-oss/Authiva/releases";
 
+    private static final long CHECK_INTERVAL_TICKS =
+            17L * 60L * 60L * 20L;
+
     private static final Pattern TAG_PATTERN =
             Pattern.compile("\"tag_name\"\\s*:\\s*\"([^\"]+)\"");
 
     private final JavaPlugin plugin;
     private final String currentVersion;
+    private BukkitTask scheduledTask;
 
     public UpdateChecker(JavaPlugin plugin) {
         this.plugin = plugin;
         this.currentVersion = plugin.getDescription().getVersion();
     }
 
-    public void check() {
-        plugin.getLogger().info("Checking for updates...");
+    public void start() {
+        check();
 
+        scheduledTask = plugin.getServer().getScheduler()
+                .runTaskTimerAsynchronously(
+                        plugin,
+                        this::check,
+                        CHECK_INTERVAL_TICKS,
+                        CHECK_INTERVAL_TICKS
+                );
+    }
+
+    public void stop() {
+        if (scheduledTask != null) {
+            scheduledTask.cancel();
+            scheduledTask = null;
+        }
+    }
+
+    private void check() {
         HttpClient client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
                 .build();
@@ -45,28 +67,25 @@ public final class UpdateChecker {
                 .build();
 
         client.sendAsync(
-                        request,
-                        HttpResponse.BodyHandlers.ofString()
-                )
-                .thenAccept(response -> {
-                    if (response.statusCode() != 200) {
-                        plugin.getLogger().warning(
-                                "Unable to check for updates. "
-                                        + "GitHub returned HTTP "
-                                        + response.statusCode() + "."
-                        );
-                        return;
-                    }
+                request,
+                HttpResponse.BodyHandlers.ofString()
+        ).thenAccept(response -> {
+            if (response.statusCode() != 200) {
+                plugin.getLogger().warning(
+                        "Unable to check for updates. GitHub returned HTTP "
+                                + response.statusCode() + "."
+                );
+                return;
+            }
 
-                    handleResponse(response.body());
-                })
-                .exceptionally(exception -> {
-                    plugin.getLogger().warning(
-                            "Unable to check for updates: "
-                                    + exception.getClass().getSimpleName()
-                    );
-                    return null;
-                });
+            handleResponse(response.body());
+        }).exceptionally(exception -> {
+            plugin.getLogger().warning(
+                    "Unable to check for updates: "
+                            + exception.getClass().getSimpleName()
+            );
+            return null;
+        });
     }
 
     private void handleResponse(String response) {
@@ -82,12 +101,7 @@ public final class UpdateChecker {
         String latestVersion = normalize(matcher.group(1));
         String installedVersion = normalize(currentVersion);
 
-        int comparison = compareVersions(
-                installedVersion,
-                latestVersion
-        );
-
-        if (comparison < 0) {
+        if (compareVersions(installedVersion, latestVersion) < 0) {
             plugin.getLogger().warning(
                     "A new Authiva version is available: "
                             + latestVersion
@@ -98,10 +112,6 @@ public final class UpdateChecker {
 
             plugin.getLogger().warning(
                     "Download: " + RELEASES_URL
-            );
-        } else {
-            plugin.getLogger().info(
-                    "Authiva is up to date."
             );
         }
     }

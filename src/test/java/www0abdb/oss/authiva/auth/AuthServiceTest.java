@@ -4,8 +4,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.bukkit.plugin.java.JavaPlugin;
+import www0abdb.oss.authiva.config.AuthivaConfig;
 import www0abdb.oss.authiva.database.AccountRepository;
 import www0abdb.oss.authiva.database.DatabaseManager;
+import www0abdb.oss.authiva.database.SessionRepository;
+
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -33,12 +38,26 @@ class AuthServiceTest {
         AccountRepository repository =
                 new AccountRepository(databaseManager);
 
+        SessionRepository sessionRepository =
+                new SessionRepository(databaseManager);
+
         AuthSessionManager sessions =
                 new AuthSessionManager();
 
+        AuthivaConfig config =
+                mock(AuthivaConfig.class);
+
+        when(config.isSessionEnabled())
+                .thenReturn(true);
+
+        when(config.getSessionDuration())
+                .thenReturn(3L * 24L * 60L * 60L * 1000L);
+
         authService = new AuthService(
                 repository,
-                sessions
+                sessionRepository,
+                sessions,
+                config
         );
     }
 

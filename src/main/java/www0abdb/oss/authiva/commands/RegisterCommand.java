@@ -4,6 +4,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.plugin.java.JavaPlugin;
 import www0abdb.oss.authiva.auth.AuthService;
 import www0abdb.oss.authiva.config.AuthivaConfig;
@@ -144,9 +145,13 @@ public final class RegisterCommand implements CommandExecutor {
                         plugin,
                         () -> {
                             switch (result) {
-case SUCCESS -> player.sendMessage(
-        config.getMessage("accountCreated")
-);
+case SUCCESS -> {
+    player.removePotionEffect(PotionEffectType.BLINDNESS);
+
+    player.sendMessage(
+            config.getMessage("accountCreated")
+    );
+}
 
                                 case ALREADY_REGISTERED ->
                                         player.sendMessage(

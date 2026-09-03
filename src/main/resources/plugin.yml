@@ -12,10 +12,12 @@ api-version: '26.2'
 commands:
   register:
     description: Create an Authiva account
-    usage: /register <password> <confirmPassword> <confirmPassword>
+    usage: /register <password> <confirmPassword>
+
   login:
     description: Log into your Authiva account
     usage: /login <password>
+
   logout:
     description: Log out of your Authiva account
     usage: /logout
@@ -23,6 +25,7 @@ commands:
   changepassword:
     description: Change your Authiva account password
     usage: /changepassword <currentPassword> <newPassword>
+
   unregister:
     description: Delete your Authiva account
     usage: /unregister <password>
