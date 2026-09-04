@@ -299,7 +299,7 @@ Lightweight and configurable authentication plugin for Paper servers.
 <br>
 
 <a href="https://hangar.papermc.io/www0abdb-oss/Authiva">
-  <img src="https://modfolio.creeperkatze.dev/hangar/project/Authiva/downloads" alt="Authiva Downloads">
+  <img src="https://img.shields.io/hangar/dt/Authiva?link=https%3A%2F%2Fhangar.papermc.io%2FGipot%2FAuthiva&style=flat-square" alt="Authiva Downloads">
 </a>
 &nbsp;&nbsp;
 <a href="https://github.com/www0abdb-oss/Authiva">
