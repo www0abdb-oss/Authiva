@@ -9,13 +9,11 @@ Lightweight authentication plugin for Minecraft servers.
 
 ![Authiva Statistics](https://bstats.org/signatures/bukkit/Authiva.svg)
 
-[Hangar](https://hangar.papermc.io/www0abdb-oss/Authiva)
-•
-[Modrinth](https://modrinth.com/plugin/authiva)
-•
-[GitHub](https://github.com/www0abdb-oss/Authiva)
-•
-[Issues](https://github.com/www0abdb-oss/Authiva/issues)
+[![Hangar](https://img.shields.io/badge/Hangar-Authiva-03a9f4?logo=hangar&logoColor=white)](https://hangar.papermc.io/www0abdb-oss/Authiva)
+[![Modrinth](https://img.shields.io/badge/Modrinth-Authiva-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/plugin/authiva)
+[![GitHub](https://img.shields.io/badge/GitHub-Authiva-181717?logo=github&logoColor=white)](https://github.com/www0abdb-oss/Authiva)
+[![Issues](https://img.shields.io/badge/Issues-Report-F97316?logo=github&logoColor=white)](https://github.com/www0abdb-oss/Authiva/issues)
+
 
 </div>
 
@@ -79,13 +77,6 @@ No client-side mod is required.
 2. Place the file into your server's `plugins` folder.
 3. Start or restart your Minecraft server.
 4. Configure Authiva to match your server's requirements.
-
-## Links
-
-* [Hangar](https://hangar.papermc.io/www0abdb-oss/Authiva)
-* [Modrinth](https://modrinth.com/plugin/authiva)
-* [GitHub](https://github.com/www0abdb-oss/Authiva)
-* [Issues](https://github.com/www0abdb-oss/Authiva/issues)
 
 ## License
 
