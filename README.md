@@ -96,7 +96,7 @@ It provides a simple authentication system without requiring any client-side mod
 
 Authiva is licensed under the **Apache License 2.0**.
 
----
+
 
 <div align="center">
 
